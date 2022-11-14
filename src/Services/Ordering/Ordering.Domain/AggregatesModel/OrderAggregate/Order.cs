@@ -173,6 +173,17 @@ public class Order
         }
     }
 
+    public void SetCompletedStatus()
+    {
+        if (_orderStatusId == OrderStatus.Paid.Id)
+        {
+            AddDomainEvent(new OrderCompletedDomainEvent(Id, OrderItems));
+
+            _orderStatusId = OrderStatus.Completed.Id;
+            _description = "Completed";
+        }
+    }
+
     private void AddOrderStartedDomainEvent(string userId, string userName, int cardTypeId, string cardNumber,
             string cardSecurityNumber, string cardHolderName, DateTime cardExpiration)
     {

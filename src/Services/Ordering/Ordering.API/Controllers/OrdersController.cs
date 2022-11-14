@@ -27,6 +27,29 @@ public class OrdersController : ControllerBase
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    [Route("complete")]
+    [HttpPut]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    public async Task<IActionResult> CompletedOrderAsync([FromBody] CompleteOrderCommand completedOrderCommand, [FromHeader(Name = "x-requestid")] string requestId)
+    {
+        bool commandResult = false;
+        _logger.LogInformation(
+           "Command: {CommandName} - {IdProperty}: {CommandId} ({@Command})",
+           completedOrderCommand.GetGenericTypeName(),
+           nameof(completedOrderCommand.OrderNumber),
+           completedOrderCommand.OrderNumber,
+           completedOrderCommand);
+        commandResult = await _mediator.Send(completedOrderCommand);
+        if (!commandResult)
+        {
+            return BadRequest();
+        }
+
+        return Ok();
+
+    }
+
     [Route("cancel")]
     [HttpPut]
     [ProducesResponseType((int)HttpStatusCode.OK)]
